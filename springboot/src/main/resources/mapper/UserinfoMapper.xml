@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demo.dao.UserinfoDao">
+    <!-- Userinfo的resultMap,column是给数据库列起的别名,它对应property类的属性-->
+    <resultMap id="result_Userinfo_Map" type="com.demo.entity.Userinfo">
+        <id column="_id" property="id" />
+        <result column="password" property="password" />
+        <result column="post" property="post" />
+        <result column="header" property="header" />
+        <result column="company" property="company" />
+        <result column="type" property="type" />
+        <result column="salary" property="salary" />
+        <result column="username" property="username" />
+        <result column="info" property="info" />
+    </resultMap>
+
+	   <!-- Assist用于辅助工具类setRequires设置的条件,${req.require}表示列名,#{req.value}表示值它是防SQL注入的 -->
+    <sql id="Assist">
+        <where>
+            <foreach collection="require" item="req" separator=" ">
+                ${req.require} 
+                <if test="req.value != null"> #{req.value}</if> 
+                <if test="req.values != null">
+                    <foreach collection="req.values" item="val" separator=","> 
+                        #{val} 
+                    </foreach> 
+                </if> 
+                <if test="req.suffix != null"> ${req.suffix}</if> 
+            </foreach>
+        </where>
+    </sql>
+
+	   <!-- updateAssist用于更新数据的使用它拓展自Assist,用于辅助工具类setRequires设置的条件,${req.require}表示列名,#{req.value}表示值它是防SQL注入的 -->
+    <sql id="updateAssist">
+        <where>
+            <foreach collection="assist.require" item="req" separator=" ">
+                ${req.require} 
+                <if test="req.value != null"> #{req.value}</if> 
+                <if test="req.values != null">
+                    <foreach collection="req.values" item="val" separator=","> 
+                        #{val} 
+                    </foreach> 
+                </if> 
+                <if test="req.suffix != null"> ${req.suffix}</if> 
+            </foreach>
+        </where>
+    </sql>
+
+    <!-- 数据库中表名为:userinfo的列名,as前是数据库的列明,as后是列的别名用于映射成实体类中的属性,需要注意的是别名必须与resultMap中的column别名一致 -->
+    <sql id="userinfo_Column">
+        userinfo._id as _id
+        ,userinfo.password as password
+        ,userinfo.post as post
+        ,userinfo.header as header
+        ,userinfo.company as company
+        ,userinfo.type as type
+        ,userinfo.salary as salary
+        ,userinfo.username as username
+        ,userinfo.info as info
+    </sql>
+
+    <!--获得类名为:Userinfo对应的数据库表的数据总行数 -->
+    <select id="getUserinfoRowCount" parameterType="com.demo.common.Assist" resultType="java.lang.Long">
+        select count(_id) from userinfo
+        <if test="require!=null"><include refid="Assist" /></if>
+    </select>
+    <!-- 获得类名为:Userinfo对应数据库中表的数据集合 -->
+    <select id="selectUserinfo" parameterType="com.demo.common.Assist"  resultMap="result_Userinfo_Map">
+        select  <if test="distinct !=null">${distinct}</if>
+        <choose>
+            <when test="resultColumn!=null">${resultColumn}</when>
+            <otherwise>
+        <include refid="userinfo_Column" /> 
+            </otherwise>
+        </choose>
+        from userinfo
+        <choose>
+            <when test="rowSize ==null">
+                <if test="require!=null">
+                    <include refid="Assist" />
+                </if>
+                <if test="order !=null">${order}</if>
+            </when>
+            <otherwise>
+                inner join
+                (
+                SELECT _id as primary_key FROM userinfo
+                <if test="require!=null">
+                    <include refid="Assist" />
+                </if>
+                <if test="order !=null">${order}</if>
+                <choose>
+                    <when test="startRow !=null and rowSize !=null">LIMIT #{startRow},#{rowSize} </when>
+                    <when test="rowSize !=null">LIMIT #{rowSize}</when>
+                 </choose>
+                 ) as tmp
+                 on tmp.primary_key=userinfo._id
+            </otherwise>
+        </choose>
+    </select> 
+
+    <!-- 获得一个Userinfo对象,以参数Userinfo对象中不为空的属性作为条件进行查询-->
+    <select id="selectUserinfoByObj" parameterType="com.demo.entity.Userinfo" resultMap="result_Userinfo_Map">
+        select 
+            <include refid="userinfo_Column" /> 
+        from userinfo
+        <where>
+            <if test="info != null "> and userinfo.info = #{info}</if>
+            <if test="username != null "> and userinfo.username = #{username}</if>
+            <if test="salary != null "> and userinfo.salary = #{salary}</if>
+            <if test="type != null "> and userinfo.type = #{type}</if>
+            <if test="company != null "> and userinfo.company = #{company}</if>
+            <if test="header != null "> and userinfo.header = #{header}</if>
+            <if test="post != null "> and userinfo.post = #{post}</if>
+            <if test="password != null "> and userinfo.password = #{password}</if>
+            <if test="id != null "> and userinfo._id = #{id}</if>
+        </where>
+    </select> 
+
+    <!-- 通过Userinfo的id获得对应数据库中表的数据对象-->
+    <select id="selectUserinfoById" parameterType="java.lang.Integer" resultMap="result_Userinfo_Map">
+        select 
+            <include refid="userinfo_Column" /> 
+        from userinfo
+        where userinfo._id = #{id}
+    </select> 
+
+    <!-- 将Userinfo插入到对应数据库的表中,包括属性值为null的数据-->
+
+    <insert id="insertUserinfo" parameterType="com.demo.entity.Userinfo">
+        insert into userinfo(_id,password,post,header,company,type,salary,username,info) 
+        values(#{id},#{password},#{post},#{header},#{company},#{type},#{salary},#{username},#{info})
+    </insert>
+
+    <!-- 将Userinfo中属性值不为null的数据,插入到对应数据库的表中-->
+    <insert id="insertNonEmptyUserinfo" parameterType="com.demo.entity.Userinfo">
+        insert into userinfo
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">_id,</if>
+            <if test="password != null">password,</if>
+            <if test="post != null">post,</if>
+            <if test="header != null">header,</if>
+            <if test="company != null">company,</if>
+            <if test="type != null">type,</if>
+            <if test="salary != null">salary,</if>
+            <if test="username != null">username,</if>
+            <if test="info != null">info,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null"> #{id},</if>
+            <if test="password != null"> #{password},</if>
+            <if test="post != null"> #{post},</if>
+            <if test="header != null"> #{header},</if>
+            <if test="company != null"> #{company},</if>
+            <if test="type != null"> #{type},</if>
+            <if test="salary != null"> #{salary},</if>
+            <if test="username != null"> #{username},</if>
+            <if test="info != null"> #{info},</if>
+        </trim>
+    </insert>
+
+    <!-- 将Userinfo批量插入到对应数据库的表中-->
+    <insert id="insertUserinfoByBatch" parameterType="ArrayList">
+        insert into userinfo(_id,password,post,header,company,type,salary,username,info) values
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.id},#{item.password},#{item.post},#{item.header},#{item.company},#{item.type},#{item.salary},#{item.username},#{item.info})
+        </foreach>
+    </insert>
+
+    <!-- 通过Userinfo的id将数据库表中对应的数据删除-->
+    <delete id="deleteUserinfoById" parameterType="java.lang.Integer">
+        delete from userinfo
+        where _id = #{id}
+    </delete>
+
+    <!-- 通过辅助工具Assist中的条件将Userinfo对应的数据库表的数据删除-->
+    <delete id="deleteUserinfo" parameterType="com.demo.common.Assist">
+        delete from userinfo
+        <if test="require!=null"><include refid="Assist" /></if>
+    </delete>
+
+    <!-- 通过Userinfo的id将Userinfo的数据更新到数据库中对应的表,包括值null的数据-->
+    <update id="updateUserinfoById" parameterType="com.demo.entity.Userinfo">
+        update userinfo set
+            password=#{password}
+            ,post=#{post}
+            ,header=#{header}
+            ,company=#{company}
+            ,type=#{type}
+            ,salary=#{salary}
+            ,username=#{username}
+            ,info=#{info}
+        where _id=#{id}
+    </update>
+
+    <!-- 通过Userinfo的id将Userinfo中属性值不为null的数据更新到数据库对应的表中-->
+    <update id="updateNonEmptyUserinfoById" parameterType="com.demo.entity.Userinfo">
+        update userinfo
+        <set>
+            <if test="password != null">
+                password=#{password},
+            </if>
+            <if test="post != null">
+                post=#{post},
+            </if>
+            <if test="header != null">
+                header=#{header},
+            </if>
+            <if test="company != null">
+                company=#{company},
+            </if>
+            <if test="type != null">
+                type=#{type},
+            </if>
+            <if test="salary != null">
+                salary=#{salary},
+            </if>
+            <if test="username != null">
+                username=#{username},
+            </if>
+            <if test="info != null">
+                info=#{info},
+            </if>
+        </set>
+        where _id=#{id}
+    </update>
+
+    <!-- 通过辅助工具Assist中的条件将Userinfo中的数据更新到数据库对应的表中,包括值为null的数据-->
+    <update id="updateUserinfo" parameterType="map">
+        update userinfo
+        <set>
+                _id=#{enti.id},
+                password=#{enti.password},
+                post=#{enti.post},
+                header=#{enti.header},
+                company=#{enti.company},
+                type=#{enti.type},
+                salary=#{enti.salary},
+                username=#{enti.username},
+                info=#{enti.info},
+        </set>
+        <if test="assist.require!=null"><include refid="updateAssist" /></if>
+    </update>
+
+    <!-- 通过辅助工具Assist中的条件将Userinfo中属性值不为null的数据更新到数据库对应的表中-->
+    <update id="updateNonEmptyUserinfo" parameterType="map">
+        update userinfo
+        <set>
+            <if test="enti.id != null">
+                _id=#{enti.id},
+            </if>
+            <if test="enti.password != null">
+                password=#{enti.password},
+            </if>
+            <if test="enti.post != null">
+                post=#{enti.post},
+            </if>
+            <if test="enti.header != null">
+                header=#{enti.header},
+            </if>
+            <if test="enti.company != null">
+                company=#{enti.company},
+            </if>
+            <if test="enti.type != null">
+                type=#{enti.type},
+            </if>
+            <if test="enti.salary != null">
+                salary=#{enti.salary},
+            </if>
+            <if test="enti.username != null">
+                username=#{enti.username},
+            </if>
+            <if test="enti.info != null">
+                info=#{enti.info},
+            </if>
+        </set>
+        <if test="assist.require!=null"><include refid="updateAssist" /></if>
+    </update>
+
+</mapper>
