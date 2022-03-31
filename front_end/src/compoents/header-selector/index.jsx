@@ -12,8 +12,8 @@ export default class HeaderSelector extends Component {
         this.headerList = []
         for (let i = 0; i < 20; i++) {
             this.headerList.push({
-                icon: require(`../../assets/images/headers/头像${i + 1}.png`),
-                text: `头像${i + 1}`
+                icon: require(`../../assets/images/headers/image${i + 1}.png`),
+                text: `image${i + 1}`
             })
         }
 
@@ -31,7 +31,7 @@ export default class HeaderSelector extends Component {
 
     render() {
         const {icon} = this.state
-        const title = !icon?<div>还未选择头像</div>:<div>已选择头像<img src={icon} alt=""/></div>
+        const title = !icon?<div>还未选择image</div>:<div>已选择image<img src={icon} alt=""/></div>
 
         return (
             <List renderHeader={() => title} className="my-list">
