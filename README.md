@@ -38,10 +38,11 @@ Vous pouvez également voir des informations vous concernant sur votre page d'ac
 Cliquez sur se déconnecter pour vous déconnecter et revenir à la page principale:
 ![2c3ab61f628ff1ffa6c43f7791e1cb8](https://user-images.githubusercontent.com/60488790/161421208-ee150735-95a8-4607-9a13-347ef294a6b2.png)
 
+Ce module implémente la fonction de chat automatique du chat et du chatbot discord, comme indiqué sur la figure, avec rappel d'informations et fonction de réponse intelligente.
 
+![4a0d7d07380e8a593fbe66fc2453983](https://user-images.githubusercontent.com/60488790/162615758-b3d85f49-fa76-43d6-a7be-0026fd40387e.jpg)
 
-
-
+![f04c96684d6165d8ab7d5ea250315c1](https://user-images.githubusercontent.com/60488790/162615763-9867be1f-9082-4b8b-bfb9-5a9536dbd94a.png)
 
 
 
