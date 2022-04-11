@@ -8,7 +8,7 @@ import QueueAnim from 'rc-queue-anim'
 import PropTypes from 'prop-types'
 
 class FetchDemo extends Component {
-    //构造函数中初始化状态值，meg：输入的值，respon:机器人返回值，megArray:用户发送的值
+    //Initialiser la valeur d'état dans le constructeur, meg : la valeur d'entrée, response : la valeur de retour du robot, megArray : la valeur envoyée par l'utilisateur
     constructor() {
       super()
       this.state = {
@@ -17,13 +17,13 @@ class FetchDemo extends Component {
         megArray: []
       }
     }
-    //input的onChange绑定事件
+    //événement de liaison onChange de l'entrée
     handleData(e) {
       this.setState({
         meg: e.target.value
       })
     }
-    //自定义函数，处理发送数据及返回的网络数据的保存操作
+    //Fonction personnalisée pour gérer l'opération de sauvegarde des données envoyées et des données réseau renvoyées
     async  sendMessage() {
       var message = this.state.meg
       if(message === ''){
